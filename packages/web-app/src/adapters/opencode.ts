@@ -128,24 +128,38 @@ export class OpenCodeAdapter implements BackendAdapter {
     return () => this.eventListeners.delete(handler)
   }
 
-  private startEventStream() {
+  private async startEventStream() {
     this.eventAbort?.abort()
     this.eventAbort = new AbortController()
-    // SSE event streaming connects to the /event endpoint
-    // Events are dispatched to all registered listeners
     if (!this.config) return
     const url = `${this.config.url}/event`
-    const headers: Record<string, string> = {}
+    const headers: Record<string, string> = { Accept: "text/event-stream" }
     if (this.config.password) {
       headers["Authorization"] = `Basic ${btoa(`${this.config.username ?? "opencode"}:${this.config.password}`)}`
     }
-    const eventSource = new EventSource(url)
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      for (const listener of this.eventListeners) {
-        listener({ type: data.type, payload: data })
+    const signal = this.eventAbort.signal
+    try {
+      const response = await fetch(url, { headers, signal })
+      if (!response.ok || !response.body) return
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ""
+      while (!signal.aborted) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split("\n")
+        buffer = lines.pop() ?? ""
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue
+          const data = JSON.parse(line.slice(6))
+          for (const listener of this.eventListeners) {
+            listener({ type: data.type, payload: data })
+          }
+        }
       }
+    } catch {
+      // Stream ended or was aborted
     }
-    this.eventAbort.signal.addEventListener("abort", () => eventSource.close())
   }
 }
