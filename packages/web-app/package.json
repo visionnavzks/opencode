@@ -1,0 +1,41 @@
+{
+  "name": "@opencode-ai/web-app",
+  "version": "0.1.0",
+  "description": "A standalone, generic web frontend for AI coding assistants (opencode, Claude Code, etc.)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@kobalte/core": "catalog:",
+    "@opencode-ai/sdk": "workspace:*",
+    "@opencode-ai/ui": "workspace:*",
+    "@opencode-ai/core": "workspace:*",
+    "@solidjs/meta": "catalog:",
+    "@solidjs/router": "catalog:",
+    "@tanstack/solid-query": "5.91.4",
+    "@solid-primitives/event-bus": "1.1.2",
+    "@solid-primitives/event-listener": "2.4.5",
+    "@solid-primitives/storage": "catalog:",
+    "@solid-primitives/i18n": "2.2.1",
+    "solid-js": "catalog:",
+    "tailwindcss": "catalog:",
+    "marked": "catalog:",
+    "shiki": "catalog:",
+    "luxon": "catalog:",
+    "diff": "catalog:",
+    "effect": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vite-plugin-icons-spritesheet": "3.0.1",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
